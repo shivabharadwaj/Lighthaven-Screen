@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def execute (ticker):
+def execute(ticker):
     # Helpers to remove %, B, M from tables and convert to float
     def remove_percent(input):
         new_input = input
@@ -10,7 +10,6 @@ def execute (ticker):
             if (x != -1):
                 new_input = new_input[0:x]
         return new_input
-
 
     def remove_bil(input):
         new_input = input
@@ -21,7 +20,6 @@ def execute (ticker):
                 new_input = new_input[0:x]
         return new_input
 
-
     def remove_mil(input):
         new_input = input
         if (type(input) == str):
@@ -31,7 +29,6 @@ def execute (ticker):
                 new_input = new_input[0:x]
         return new_input
 
-
     def remove_dash(input):
         new_input = input
         if (type(input) == str):
@@ -39,14 +36,12 @@ def execute (ticker):
                 new_input = '0'
         return new_input
 
-
     def remove_comma(input):
         new_input = input
         x = input.find(',')
         if (x != -1):
             new_input = new_input.replace(',', '')
         return new_input
-
 
     def fix_negative(input):
         new_input = input
@@ -58,7 +53,6 @@ def execute (ticker):
             new_input = new_input.replace(')', '')
         return new_input
 
-
     def clean_string(input):
         input = remove_percent(input)
         input = remove_bil(input)
@@ -68,14 +62,12 @@ def execute (ticker):
         input = fix_negative(input)
         return (input)
 
-
     def clean_table(df):
         for col in range(df.shape[1]):
             for row in range(df.shape[0]):
                 df.iloc[row][col] = clean_string(df.iloc[row][col])
                 df.iloc[row][col] = float(df.iloc[row][col])
         return df
-
 
     def remove_bil_fundamental(input):
         new_input = input
@@ -91,19 +83,19 @@ def execute (ticker):
                 new_input = float(new_input[0:y])
         return new_input
 
-
     # Annual Financials
 
     try:
         annual_rev_df = pd.read_html('https://www.marketwatch.com/investing/stock/' + ticker + '/financials')[0]
         annual_NI_df = pd.read_html('https://www.marketwatch.com/investing/stock/' + ticker + '/financials')[1]
         annual_cash_df = \
-        pd.read_html('https://www.marketwatch.com/investing/stock/' + ticker + '/financials/balance-sheet')[0]
+            pd.read_html('https://www.marketwatch.com/investing/stock/' + ticker + '/financials/balance-sheet')[0]
         annual_debt_df = \
-        pd.read_html('https://www.marketwatch.com/investing/stock/' + ticker + '/financials/balance-sheet')[2]
-        annual_fcf_df = pd.read_html('https://www.marketwatch.com/investing/stock/' + ticker + '/financials/cash-flow')[2]
+            pd.read_html('https://www.marketwatch.com/investing/stock/' + ticker + '/financials/balance-sheet')[2]
+        annual_fcf_df = pd.read_html('https://www.marketwatch.com/investing/stock/' + ticker + '/financials/cash-flow')[
+            2]
     except:
-        print("Could not scrape yearly financial data")
+        return("Could not scrape yearly financial data")
 
     annual_rev_df.columns.values[0] = "METRIC"
     annual_NI_df.columns.values[0] = "METRIC"
@@ -134,7 +126,7 @@ def execute (ticker):
         quarterly_financial_NI_df = pd.read_html('https://www.marketwatch.com/investing/stock/' + ticker +
                                                  '/financials/income/quarter')[1]
     except:
-        print("Could not scrape quarterly financial data")
+        return ("Could not scrape quarterly financial data")
 
     quarterly_financial_rev_df.columns.values[0] = 'METRIC'
     quarterly_financial_NI_df.columns.values[0] = 'METRIC'
@@ -167,7 +159,6 @@ def execute (ticker):
     fundamental_df.iloc[2][0] = remove_bil_fundamental(fundamental_df.iloc[2][0])
     fundamental_df.iloc[3][0] = float(fundamental_df.iloc[3][0])
     fundamental_df = fundamental_df.rename({'Market Cap': 'Market Cap (Mil)'})
-
 
     # Long Screen Tables
     # Fast Grower
@@ -312,14 +303,12 @@ def execute (ticker):
         df.iloc[3, 0] = dead_fcf(annual_financials_df)
         return df
 
-
     # Fad Screen
     def fad_rev(df):
         if (df.iloc[1, -1] >= 39.5 and df.iloc[1, -2] >= 39.5 and df.iloc[1, -3] >= 39.5):
             return 'True'
         else:
             return 'False'
-
 
     def fad_eps(df):
         if (df.iloc[2, 1] > 0):
@@ -388,11 +377,5 @@ def execute (ticker):
     final_output.append(s9)
 
     return final_output
-
-
-
-
-
-
 
 

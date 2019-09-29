@@ -12,10 +12,13 @@ import plotly.graph_objects as go
 import requests
 import pandas as pd
 from Screening_Logic import execute
+import base64
 
 app = Dash()
 external_stylesheets = ['https://codepen.io/rmarren1/pen/mLqGRg.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets, )
+
+
 
 colors = {
     'background': '#050505',
@@ -23,8 +26,8 @@ colors = {
 }
 
 app.layout = html.Div([
-    dcc.Input(id = 'ticker', value = 'AMZN', type = 'text'),
-    html.Button('Screen!', id='button'),
+    dcc.Input(id = 'ticker', value = '', type = 'text', placeholder="Enter Ticker Here"),
+    html.Button('Screen', id='button'),
     html.Div(id = 'testing'),
 ])
 
@@ -41,17 +44,18 @@ app.layout = html.Div([
 def update_page(n_clicks, ticker):
     grid = dui.Grid(_id="grid", num_rows=12, num_cols=12, grid_padding=0)
 
-    # stock_name = Share(ticker).get_name()
-    # print(stock_name)
     name_output = html.Div([html.H1('LIGHTHAVEN FUND SCREENER')],
-                           style={'textAlign': 'center', 'color':'black', 'fontSize':20})
-
+                           style={'textAlign': 'center', 'fontSize':20})
 
     grid.add_element(col=1, row=1, width=12, height=1, element=name_output)
 
-    # Black Border
+    # Background Color
     grid.add_element(col=1, row=2, width=12, height=11, element=html.Div(
         style={"background-color": "gainsboro", "height": "100%", "width": "100%"}
+    ))
+
+    grid.add_element(col=1, row=1, width=12, height=1, element=html.Div(
+        style={"background-color": "lightskyblue", "height": "100%", "width": "100%"}
     ))
 
     # Stock Chart
@@ -93,8 +97,13 @@ def update_page(n_clicks, ticker):
     grid.add_element(col=8, row=2, width=5, height=6, element=description_output)
 
 
+    all_info = execute(ticker)
+    if (type(all_info) == str):
+        not_found = description_output = html.Div([html.H1("Please verify the ticker was entered correctly. Since the information could not be scraped, please manually screen the company.")])
+        grid.add_element(col=1, row=7, width=3, height=3, element=not_found)
+        return dui.Layout( grid=grid)
 
-    fast_df = execute(ticker)[0]
+    fast_df = all_info[0]
     fast = dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in fast_df.columns],
@@ -143,7 +152,7 @@ def update_page(n_clicks, ticker):
 
     grid.add_element(col=1, row=7, width=3, height=3, element=fast)
 
-    stalwart_df = execute(ticker)[1]
+    stalwart_df = all_info[1]
     stalwart = dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in stalwart_df.columns],
@@ -192,7 +201,7 @@ def update_page(n_clicks, ticker):
 
     grid.add_element(col=1, row=9, width=3, height=2, element=stalwart)
 
-    surfer_df = execute(ticker)[2]
+    surfer_df = all_info[2]
     surfer = dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in surfer_df.columns],
@@ -241,7 +250,7 @@ def update_page(n_clicks, ticker):
 
     grid.add_element(col=1, row=11, width=3, height=2, element=surfer)
 
-    dead_df = execute(ticker)[3]
+    dead_df = all_info[3]
     dead = dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in dead_df.columns],
@@ -290,7 +299,7 @@ def update_page(n_clicks, ticker):
 
     grid.add_element(col=4, row=7, width=3, height=2, element=dead)
 
-    fad_df = execute(ticker)[4]
+    fad_df = all_info[4]
     fad = dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in fad_df.columns],
@@ -339,7 +348,7 @@ def update_page(n_clicks, ticker):
 
     grid.add_element(col=4, row=9, width=3, height=2, element=fad)
 
-    hot_df = execute(ticker)[5]
+    hot_df = all_info[5]
     hot = dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in hot_df.columns],
@@ -388,7 +397,7 @@ def update_page(n_clicks, ticker):
 
     grid.add_element(col=4, row=11, width=3, height=2, element=hot)
 
-    fundamentals_df = execute(ticker)[6]
+    fundamentals_df = all_info[6]
     fundamentals = dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in fundamentals_df.columns],
@@ -411,9 +420,9 @@ def update_page(n_clicks, ticker):
         ]
     )
 
-    grid.add_element(col=8, row=6, width=2, height=2, element=fundamentals)
+    grid.add_element(col=8, row=7, width=2, height=2, element=fundamentals)
     
-    annual_financials_df = execute(ticker)[7]
+    annual_financials_df = all_info[7]
     annual = dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in annual_financials_df.columns],
@@ -436,9 +445,9 @@ def update_page(n_clicks, ticker):
         ]
     )
     
-    grid.add_element(col=8, row=8, width=5, height=2, element=annual)
+    grid.add_element(col=8, row=9, width=5, height=2, element=annual)
 
-    quarterly_financials_df = execute(ticker)[8]
+    quarterly_financials_df = all_info[8]
     quarterly = dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in quarterly_financials_df.columns],
@@ -461,7 +470,7 @@ def update_page(n_clicks, ticker):
         ]
     )
 
-    grid.add_element(col=8, row=10, width=5, height=2, element=quarterly)
+    grid.add_element(col=8, row=11, width=5, height=2, element=quarterly)
 
     return dui.Layout( grid=grid)
 
