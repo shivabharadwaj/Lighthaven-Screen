@@ -7,6 +7,7 @@ from dash.dependencies import Input, Output, State
 import datetime
 from dateutil.relativedelta import relativedelta
 import yfinance as yf
+from yahoo_finance import Share
 import plotly.graph_objects as go
 import requests
 import pandas as pd
@@ -40,21 +41,17 @@ app.layout = html.Div([
 def update_page(n_clicks, ticker):
     grid = dui.Grid(_id="grid", num_rows=12, num_cols=12, grid_padding=0)
 
+    # stock_name = Share(ticker).get_name()
+    # print(stock_name)
+    name_output = html.Div([html.H1('LIGHTHAVEN FUND SCREENER')],
+                           style={'textAlign': 'center', 'color':'black', 'fontSize':20})
+
+
+    grid.add_element(col=1, row=1, width=12, height=1, element=name_output)
+
     # Black Border
-    grid.add_element(col=1, row=1, width=12, height=1, element=html.Div(
-        style={"background-color": "black", "height": "100%", "width": "100%"}
-    ))
-
-    grid.add_element(col=1, row=12, width=12, height=1, element=html.Div(
-        style={"background-color": "black", "height": "100%", "width": "100%"}
-    ))
-
-    grid.add_element(col=1, row=2, width=1, height=10, element=html.Div(
-        style={"background-color": "black", "height": "100%", "width": "100%"}
-    ))
-
-    grid.add_element(col=12, row=2, width=1, height=10, element=html.Div(
-        style={"background-color": "black", "height": "100%", "width": "100%"}
+    grid.add_element(col=1, row=2, width=12, height=11, element=html.Div(
+        style={"background-color": "gainsboro", "height": "100%", "width": "100%"}
     ))
 
     # Stock Chart
@@ -68,11 +65,11 @@ def update_page(n_clicks, ticker):
     trace_close = go.Scatter(x=list(price_data.index), y=list(price_data.Close), name="close",
                              line=dict(color="#03b1fc"))
     data = [trace_close]
-    layout = dict(title=ticker + " - Historic Stock Price", showlegend=False)
+    layout = dict(title=ticker + " - HISTORIC STOCK PRICE", showlegend=False)
     fig = dict(data=data, layout=layout)
     stock_chart = dcc.Graph(id="Stock Graph", figure=fig)
 
-    grid.add_element(col=2, row=2, width=6, height=5, element=(stock_chart))
+    grid.add_element(col=1, row=2, width=6, height=5, element=(stock_chart))
 
     # Company Description
     def find_description(list):
@@ -88,16 +85,14 @@ def update_page(n_clicks, ticker):
         data = tree.xpath('//p/text()')
         description = find_description(data)[0]
         description = str(description)
-        description_output = html.Div([html.H1('Company Description'),
+        description_output = html.Div([html.H1('COMPANY DESCRIPTION'),
                                        html.P(description)])
     except:
         description_output = html.Div([html.P("Could not find description")])
 
-    grid.add_element(col=8, row=2, width=4, height=6, element=description_output)
+    grid.add_element(col=8, row=2, width=5, height=6, element=description_output)
 
-    grid.add_element(col=8, row=7, width=4, height=5, element=html.Div(
-        style={"background-color": "yellow", "height": "100%", "width": "100%"}
-    ))
+
 
     fast_df = execute(ticker)[0]
     fast = dash_table.DataTable(
@@ -116,29 +111,37 @@ def update_page(n_clicks, ticker):
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "True"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "True"'
                 },
                 'backgroundColor': '#ACFC6A',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "False"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "False"'
                 },
                 'backgroundColor': '#FF8787',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status'},
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "Subjective"'
+                },
+                'backgroundColor': '#fdff82',
+                'color': 'black',
+            },
+            {
+                'if': {
+                    'column_id': 'STATUS'},
                 'width': '25%'
             }
         ],
     )
 
-    grid.add_element(col=2, row=7, width=3, height=3, element=fast)
+    grid.add_element(col=1, row=7, width=3, height=3, element=fast)
 
     stalwart_df = execute(ticker)[1]
     stalwart = dash_table.DataTable(
@@ -157,29 +160,37 @@ def update_page(n_clicks, ticker):
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "True"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "True"'
                 },
                 'backgroundColor': '#ACFC6A',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "False"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "False"'
                 },
                 'backgroundColor': '#FF8787',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status'},
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "Subjective"'
+                },
+                'backgroundColor': '#fdff82',
+                'color': 'black',
+            },
+            {
+                'if': {
+                    'column_id': 'STATUS'},
                 'width': '25%'
             }
         ],
     )
 
-    grid.add_element(col=2, row=9, width=3, height=2, element=stalwart)
+    grid.add_element(col=1, row=9, width=3, height=2, element=stalwart)
 
     surfer_df = execute(ticker)[2]
     surfer = dash_table.DataTable(
@@ -198,29 +209,37 @@ def update_page(n_clicks, ticker):
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "True"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "True"'
                 },
                 'backgroundColor': '#ACFC6A',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "False"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "False"'
                 },
                 'backgroundColor': '#FF8787',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status'},
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "Subjective"'
+                },
+                'backgroundColor': '#fdff82',
+                'color': 'black',
+            },
+            {
+                'if': {
+                    'column_id': 'STATUS'},
                 'width': '25%'
             }
         ],
     )
 
-    grid.add_element(col=2, row=11, width=3, height=2, element=surfer)
+    grid.add_element(col=1, row=11, width=3, height=2, element=surfer)
 
     dead_df = execute(ticker)[3]
     dead = dash_table.DataTable(
@@ -239,29 +258,37 @@ def update_page(n_clicks, ticker):
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "True"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "True"'
                 },
                 'backgroundColor': '#ACFC6A',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "False"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "False"'
                 },
                 'backgroundColor': '#FF8787',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status'},
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "Subjective"'
+                },
+                'backgroundColor': '#fdff82',
+                'color': 'black',
+            },
+            {
+                'if': {
+                    'column_id': 'STATUS'},
                 'width': '25%'
             }
         ],
     )
 
-    grid.add_element(col=5, row=7, width=3, height=2, element=dead)
+    grid.add_element(col=4, row=7, width=3, height=2, element=dead)
 
     fad_df = execute(ticker)[4]
     fad = dash_table.DataTable(
@@ -280,29 +307,37 @@ def update_page(n_clicks, ticker):
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "True"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "True"'
                 },
                 'backgroundColor': '#ACFC6A',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "False"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "False"'
                 },
                 'backgroundColor': '#FF8787',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status'},
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "Subjective"'
+                },
+                'backgroundColor': '#fdff82',
+                'color': 'black',
+            },
+            {
+                'if': {
+                    'column_id': 'STATUS'},
                 'width': '25%'
             }
         ],
     )
 
-    grid.add_element(col=5, row=9, width=3, height=2, element=fad)
+    grid.add_element(col=4, row=9, width=3, height=2, element=fad)
 
     hot_df = execute(ticker)[5]
     hot = dash_table.DataTable(
@@ -321,29 +356,112 @@ def update_page(n_clicks, ticker):
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "True"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "True"'
                 },
                 'backgroundColor': '#ACFC6A',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status',
-                    'filter_query': '{Status} eq "False"'
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "False"'
                 },
                 'backgroundColor': '#FF8787',
                 'color': 'black',
             },
             {
                 'if': {
-                    'column_id': 'Status'},
+                    'column_id': 'STATUS',
+                    'filter_query': '{STATUS} eq "Subjective"'
+                },
+                'backgroundColor': '#fdff82',
+                'color': 'black',
+            },
+            {
+                'if': {
+                    'column_id': 'STATUS'},
                     'width': '25%'
             }
         ],
     )
 
-    grid.add_element(col=5, row=11, width=3, height=2, element=hot)
+    grid.add_element(col=4, row=11, width=3, height=2, element=hot)
+
+    fundamentals_df = execute(ticker)[6]
+    fundamentals = dash_table.DataTable(
+        id='table',
+        columns=[{"name": i, "id": i} for i in fundamentals_df.columns],
+        data=fundamentals_df.to_dict('records'),
+        style_cell={'textAlign': 'left'},
+        style_header={
+            'backgroundColor': 'white',
+            'fontWeight': 'bold'
+        },
+        style_data_conditional=[
+            {
+                'if': {'row_index': 'odd'},
+                'backgroundColor': 'rgb(248, 248, 248)'
+            },
+            {
+                'if': {
+                    'column_id': 'STATUS'},
+                'width': '25%'
+            }
+        ]
+    )
+
+    grid.add_element(col=8, row=6, width=2, height=2, element=fundamentals)
+    
+    annual_financials_df = execute(ticker)[7]
+    annual = dash_table.DataTable(
+        id='table',
+        columns=[{"name": i, "id": i} for i in annual_financials_df.columns],
+        data=annual_financials_df.to_dict('records'),
+        style_cell={'textAlign': 'left'},
+        style_header={
+            'backgroundColor': 'white',
+            'fontWeight': 'bold'
+        },
+        style_data_conditional=[
+            {
+                'if': {'row_index': 'odd'},
+                'backgroundColor': 'rgb(248, 248, 248)'
+            },
+            {
+                'if': {
+                    'column_id': 'STATUS'},
+                'width': '25%'
+            }
+        ]
+    )
+    
+    grid.add_element(col=8, row=8, width=5, height=2, element=annual)
+
+    quarterly_financials_df = execute(ticker)[8]
+    quarterly = dash_table.DataTable(
+        id='table',
+        columns=[{"name": i, "id": i} for i in quarterly_financials_df.columns],
+        data=quarterly_financials_df.to_dict('records'),
+        style_cell={'textAlign': 'left'},
+        style_header={
+            'backgroundColor': 'white',
+            'fontWeight': 'bold'
+        },
+        style_data_conditional=[
+            {
+                'if': {'row_index': 'odd'},
+                'backgroundColor': 'rgb(248, 248, 248)'
+            },
+            {
+                'if': {
+                    'column_id': 'STATUS'},
+                'width': '25%'
+            }
+        ]
+    )
+
+    grid.add_element(col=8, row=10, width=5, height=2, element=quarterly)
 
     return dui.Layout( grid=grid)
 

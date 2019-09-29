@@ -105,26 +105,26 @@ def execute (ticker):
     except:
         print("Could not scrape yearly financial data")
 
-    annual_rev_df.columns.values[0] = "metric"
-    annual_NI_df.columns.values[0] = "metric"
-    annual_cash_df.columns.values[0] = "metric"
-    annual_debt_df.columns.values[0] = "metric"
-    annual_fcf_df.columns.values[0] = "metric"
+    annual_rev_df.columns.values[0] = "METRIC"
+    annual_NI_df.columns.values[0] = "METRIC"
+    annual_cash_df.columns.values[0] = "METRIC"
+    annual_debt_df.columns.values[0] = "METRIC"
+    annual_fcf_df.columns.values[0] = "METRIC"
 
     annual_rev_df = annual_rev_df.loc[[0, 1], :]  # Sales and Sales Growth
-    annual_EPS_df = annual_NI_df.loc[annual_NI_df.metric == 'EPS (Diluted)']
-    annual_EPS_growth_df = annual_NI_df.loc[annual_NI_df.metric == 'EPS (Diluted) Growth']
+    annual_EPS_df = annual_NI_df.loc[annual_NI_df.METRIC == 'EPS (Diluted)']
+    annual_EPS_growth_df = annual_NI_df.loc[annual_NI_df.METRIC == 'EPS (Diluted) Growth']
     annual_NI_df = annual_EPS_df.append(annual_EPS_growth_df)  # EPS and EPS Growth
     annual_cash_df = annual_cash_df.loc[[1, 2], :]  # Cash and ST Securities
-    annual_debt_df = annual_debt_df.loc[annual_debt_df.metric == 'Long-Term Debt']  # Debt
-    annual_fcf_df = annual_fcf_df.loc[annual_fcf_df.metric == 'Free Cash Flow']  # FCF
+    annual_debt_df = annual_debt_df.loc[annual_debt_df.METRIC == 'Long-Term Debt']  # Debt
+    annual_fcf_df = annual_fcf_df.loc[annual_fcf_df.METRIC == 'Free Cash Flow']  # FCF
 
     annual_financials_df = annual_rev_df.append(
         annual_NI_df.append(annual_debt_df.append(annual_fcf_df.append(annual_cash_df))))
     annual_financials_df = annual_financials_df.drop(columns='5-year trend')
-    annual_financials_df = annual_financials_df.set_index(['metric'])
+    annual_financials_df = annual_financials_df.set_index(['METRIC'])
     annual_financials_df = annual_financials_df.rename({'Sales Growth': 'Sales Growth (%)',
-                                                        'EPS (Diluted) Growth': 'EPS (Diluted) Growth (%)'})
+                                                        'EPS (Diluted) Growth': 'EPS Growth (%)'})
     annual_financials_df = clean_table(annual_financials_df)
 
     # Quarterly Financials
@@ -136,19 +136,19 @@ def execute (ticker):
     except:
         print("Could not scrape quarterly financial data")
 
-    quarterly_financial_rev_df.columns.values[0] = 'metric'
-    quarterly_financial_NI_df.columns.values[0] = 'metric'
+    quarterly_financial_rev_df.columns.values[0] = 'METRIC'
+    quarterly_financial_NI_df.columns.values[0] = 'METRIC'
 
     quarterly_financial_rev_df = quarterly_financial_rev_df.loc[[0, 1], :]  # Sales and Sales Growth
-    quarterly_EPS_df = quarterly_financial_NI_df.loc[quarterly_financial_NI_df.metric == 'EPS (Diluted)']
-    quarterly_EPS_growth_df = quarterly_financial_NI_df.loc[quarterly_financial_NI_df.metric == 'EPS (Diluted) Growth']
+    quarterly_EPS_df = quarterly_financial_NI_df.loc[quarterly_financial_NI_df.METRIC == 'EPS (Diluted)']
+    quarterly_EPS_growth_df = quarterly_financial_NI_df.loc[quarterly_financial_NI_df.METRIC == 'EPS (Diluted) Growth']
     quarterly_financial_NI_df = quarterly_EPS_df.append(quarterly_EPS_growth_df)  # EPS and EPS Growth
 
     quarterly_financials_df = quarterly_financial_rev_df.append(quarterly_financial_NI_df)
     quarterly_financials_df = quarterly_financials_df.drop(columns='5-qtr trend')
-    quarterly_financials_df = quarterly_financials_df.set_index(['metric'])
+    quarterly_financials_df = quarterly_financials_df.set_index(['METRIC'])
     quarterly_financials_df = quarterly_financials_df.rename({'Sales Growth': 'Sales Growth (%)',
-                                                              'EPS (Diluted) Growth': 'EPS (Diluted) Growth (%)'})
+                                                              'EPS (Diluted) Growth': 'EPS Growth (%)'})
     quarterly_financials_df = clean_table(quarterly_financials_df)
 
     # Fundamental Data
@@ -161,8 +161,8 @@ def execute (ticker):
 
     fundamental_df = fundamental_df.reset_index(drop=True)
     fundamental_df = fundamental_df.iloc[[0, 5, 8, 10], :]
-    fundamental_df.columns = ['metric', 'value']
-    fundamental_df = fundamental_df.set_index(['metric'])
+    fundamental_df.columns = ['METRIC', 'VALUE']
+    fundamental_df = fundamental_df.set_index(['METRIC'])
     fundamental_df.iloc[0][0] = float(fundamental_df.iloc[0][0])
     fundamental_df.iloc[2][0] = remove_bil_fundamental(fundamental_df.iloc[2][0])
     fundamental_df.iloc[3][0] = float(fundamental_df.iloc[3][0])
@@ -173,40 +173,40 @@ def execute (ticker):
     # Fast Grower
     fast_data = [['Revenue Growth >15% last 3 yrs', False], ['EPS Growth >15% last 3 yrs', False],
                  ['LTD/Cash + Securities <= 2', False], ['Positive FCF last 3 years', False]]
-    fast_grower = pd.DataFrame(fast_data, columns=['FAST GROWER (LONG)', 'Status'])
+    fast_grower = pd.DataFrame(fast_data, columns=['FAST GROWER (LONG)', 'STATUS'])
     fast_grower = fast_grower.set_index(['FAST GROWER (LONG)'])
 
     # Stalwart
     stalwart_data = [['Revenue Growth >10% last 3 yrs', False], ['EPS Growth >10% last 3 yrs', False],
                      ['Market Cap >$100MM', False], ['Mature company but still growing', 'Subjective']]
-    stalwart = pd.DataFrame(stalwart_data, columns=['STALWART (LONG)', 'Status'])
+    stalwart = pd.DataFrame(stalwart_data, columns=['STALWART (LONG)', 'STATUS'])
     stalwart = stalwart.set_index(['STALWART (LONG)'])
 
     # Surfer
     surfer_data = [['Revenue Growth >35% last 3 yrs', False],
-                   ['Company will dominate/create an industry', 'Subjective']]
-    surfer = pd.DataFrame(surfer_data, columns=['SURFER (LONG)', 'Status'])
+                   ['Company will dominate/create an industry', 'Subjective'],
+                   ['Company will disrupt an industry', 'Subjective']]
+    surfer = pd.DataFrame(surfer_data, columns=['SURFER (LONG)', 'STATUS'])
     surfer = surfer.set_index(['SURFER (LONG)'])
 
     # Short Screen Tables
     # Dead Company
     dead_data = [['Declining EPS last 4 qts', False], ['Declinging Revenue last 4 qts', False],
                  ['LTD/Cash + Securities >= 2', False], ['Negative FCF', False]]
-    dead_walking = pd.DataFrame(dead_data, columns=['DEAD COMPANY (SHORT)', 'Status'])
+    dead_walking = pd.DataFrame(dead_data, columns=['DEAD COMPANY (SHORT)', 'STATUS'])
     dead_walking = dead_walking.set_index(['DEAD COMPANY (SHORT)'])
 
     # Fad
     fad_data = [['Revenue Growth >40% last 3 yrs', False], ['Positve Earnings TTM', False],
                 ['EPS declined most recent qtr', False], ['Product/service is a fad', 'Subjective']]
-    fad = pd.DataFrame(fad_data, columns=['FAD STOCK (SHORT)', 'Status'])
+    fad = pd.DataFrame(fad_data, columns=['FAD STOCK (SHORT)', 'STATUS'])
     fad = fad.set_index(['FAD STOCK (SHORT)'])
 
     # Hot Story
     hot_data = [['Price increased dramatically, levelling off', 'Subjective'],
                 ['Many competitors', 'Subjective'], ['High PE ratio', False]]
-    hot_story = pd.DataFrame(hot_data, columns=['HOT STORY (SHORT)', 'Status'])
+    hot_story = pd.DataFrame(hot_data, columns=['HOT STORY (SHORT)', 'STATUS'])
     hot_story = hot_story.set_index(['HOT STORY (SHORT)'])
-
 
     # Fast_Grower Screen
     def fast_rev(df):
@@ -215,13 +215,11 @@ def execute (ticker):
         else:
             return 'False'
 
-
     def fast_eps(df):
         if (df.iloc[3, -1] >= 14.5 and df.iloc[3, -2] >= 14.5 and df.iloc[3, -3] >= 14.5):
             return 'True'
         else:
             return 'False'
-
 
     def fast_debt_cash(df):
         cash_securities = df.iloc[6, -1] + df.iloc[7, -1]
@@ -231,13 +229,11 @@ def execute (ticker):
         else:
             return 'False'
 
-
     def fast_fcf(df):
         if (df.iloc[5, -1] > 0 and df.iloc[5, -2] > 0 and df.iloc[5, -3] > 0):
             return 'True'
         else:
             return 'False'
-
 
     def update_fast_grower(df):
         df.iloc[0, 0] = fast_rev(annual_financials_df)
@@ -246,7 +242,6 @@ def execute (ticker):
         df.iloc[3, 0] = fast_fcf(annual_financials_df)
         return df
 
-
     # Stalwart Screen
     def stalwart_rev(df):
         if (df.iloc[1, -1] >= 9.5 and df.iloc[1, -2] >= 9.5 and df.iloc[1, -3] >= 9.5):
@@ -254,13 +249,11 @@ def execute (ticker):
         else:
             return 'False'
 
-
     def stalwart_eps(df):
         if (df.iloc[3, -1] >= 9.5 and df.iloc[3, -2] >= 9.5 and df.iloc[3, -3] >= 9.5):
             return 'True'
         else:
             return 'False'
-
 
     def stalwart_market_cap(df):
         if (df.iloc[2, 0] >= 100):
@@ -268,13 +261,11 @@ def execute (ticker):
         else:
             return 'False'
 
-
     def update_stalwart(df):
         df.iloc[0, 0] = stalwart_rev(annual_financials_df)
         df.iloc[1, 0] = stalwart_eps(annual_financials_df)
         df.iloc[2, 0] = stalwart_market_cap(fundamental_df)
         return df
-
 
     # Surfer Screen
     def surfer_rev(df):
@@ -283,11 +274,9 @@ def execute (ticker):
         else:
             return 'False'
 
-
     def update_surfer(df):
         df.iloc[0, 0] = surfer_rev(annual_financials_df)
         return df
-
 
     # Dead Walking Screen
     def dead_eps(df):
@@ -296,13 +285,11 @@ def execute (ticker):
         else:
             return 'False'
 
-
     def dead_rev(df):
         if (df.iloc[1, -1] < 0 and df.iloc[1, -2] < 0 and df.iloc[1, -3] < 0 and df.iloc[1, -4] < 0):
             return 'True'
         else:
             return 'False'
-
 
     def dead_debt_cash(df):
         cash_securities = df.iloc[6, -1] + df.iloc[7, -1]
@@ -312,13 +299,11 @@ def execute (ticker):
         else:
             return 'False'
 
-
     def dead_fcf(df):
         if (df.iloc[5, -1] < 0):
             return 'True'
         else:
             return 'False'
-
 
     def update_dead(df):
         df.iloc[0, 0] = dead_eps(quarterly_financials_df)
@@ -342,20 +327,17 @@ def execute (ticker):
         else:
             return 'False'
 
-
     def fad_eps_decline(df):
         if (df.iloc[3, -1] < 0):
             return 'True'
         else:
             return 'False'
 
-
     def update_fad(df):
         df.iloc[0, 0] = fad_rev(annual_financials_df)
         df.iloc[1, 0] = fad_eps(annual_financials_df)
         df.iloc[2, 0] = fad_eps_decline(annual_financials_df)
         return df
-
 
     # Hot Story Screen
     def hot_pe(df):
@@ -364,11 +346,9 @@ def execute (ticker):
         else:
             return 'False'
 
-
     def update_hot(df):
         df.iloc[2, 0] = hot_pe(fundamental_df)
         return df
-
 
     # Display All Screens
     final_output = []
@@ -391,6 +371,11 @@ def execute (ticker):
     s6 = update_hot(hot_story)
     s6 = s6.reset_index()
 
+    s7 = fundamental_df.reset_index()
+
+    s8 = annual_financials_df.reset_index()
+
+    s9 = quarterly_financials_df.reset_index()
 
     final_output.append(s1)
     final_output.append(s2)
@@ -398,9 +383,9 @@ def execute (ticker):
     final_output.append(s4)
     final_output.append(s5)
     final_output.append(s6)
-    final_output.append(fundamental_df)
-    final_output.append(annual_financials_df)
-    final_output.append(quarterly_financials_df)
+    final_output.append(s7)
+    final_output.append(s8)
+    final_output.append(s9)
 
     return final_output
 
