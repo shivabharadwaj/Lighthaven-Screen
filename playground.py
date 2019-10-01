@@ -17,6 +17,7 @@ import base64
 app = Dash()
 external_stylesheets = ['https://codepen.io/rmarren1/pen/mLqGRg.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets, )
+server = app
 
 
 
