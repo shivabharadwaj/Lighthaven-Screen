@@ -11,6 +11,16 @@ def execute(ticker):
                 new_input = new_input[0:x]
         return new_input
 
+
+    def remove_tril(input):
+        new_input = input
+        if (type(input) == str):
+            new_input = input
+            x = input.find('T')
+            if (x != -1):
+                new_input = new_input[0:x]
+        return new_input
+
     def remove_bil(input):
         new_input = input
         if (type(input) == str):
@@ -55,6 +65,7 @@ def execute(ticker):
 
     def clean_string(input):
         input = remove_percent(input)
+        input = remove_tril(input)
         input = remove_bil(input)
         input = remove_mil(input)
         input = remove_dash(input)
@@ -73,6 +84,12 @@ def execute(ticker):
         new_input = input
 
         if (type(input) == str):
+
+            z = input.find('T')
+            if (z != -1):
+                new_input = new_input[0:z]
+                new_input = float(new_input) * 1000 * 1000
+
             x = input.find('B')
             if (x != -1):
                 new_input = new_input[0:x]
