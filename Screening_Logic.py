@@ -65,8 +65,8 @@ def execute(ticker):
 
     def clean_string(input):
         input = remove_percent(input)
-        input = remove_tril(input)
         input = remove_bil(input)
+        input = remove_tril(input)
         input = remove_mil(input)
         input = remove_dash(input)
         input = remove_comma(input)
