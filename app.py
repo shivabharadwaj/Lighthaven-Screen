@@ -55,6 +55,10 @@ def update_page(n_clicks, ticker):
         style={"background-color": "gainsboro", "height": "100%", "width": "100%"}
     ))
 
+    grid.add_element(col=1, row=6, width=6, height=4, element=html.Div(
+        style={"background-color": "black", "height": "100%", "width": "100%"}
+    ))
+
     grid.add_element(col=1, row=1, width=12, height=1, element=html.Div(
         style={"background-color": "lightskyblue", "height": "100%", "width": "100%"}
     ))
@@ -70,11 +74,14 @@ def update_page(n_clicks, ticker):
     trace_close = go.Scatter(x=list(price_data.index), y=list(price_data.Close), name="close",
                              line=dict(color="#03b1fc"))
     data = [trace_close]
-    layout = dict(title=ticker + " - HISTORIC STOCK PRICE", showlegend=False)
+    layout = go.Layout(
+        dict(title=ticker + " - HISTORIC STOCK PRICE", showlegend=False),
+        margin = {'l': 50, 'r': 50, 't': 50, 'b': 50}
+    )
     fig = dict(data=data, layout=layout)
     stock_chart = dcc.Graph(id="Stock Graph", figure=fig)
 
-    grid.add_element(col=1, row=2, width=6, height=5, element=(stock_chart))
+    grid.add_element(col=1, row=2, width=6, height=4, element=(stock_chart))
 
     # Company Description
     def find_description(list):
@@ -151,7 +158,7 @@ def update_page(n_clicks, ticker):
         ],
     )
 
-    grid.add_element(col=1, row=7, width=3, height=3, element=fast)
+    grid.add_element(col=1, row=6, width=3, height=3, element=fast)
 
     stalwart_df = all_info[1]
     stalwart = dash_table.DataTable(
@@ -298,7 +305,7 @@ def update_page(n_clicks, ticker):
         ],
     )
 
-    grid.add_element(col=4, row=7, width=3, height=2, element=dead)
+    grid.add_element(col=4, row=6, width=3, height=3, element=dead)
 
     fad_df = all_info[4]
     fad = dash_table.DataTable(
@@ -421,7 +428,7 @@ def update_page(n_clicks, ticker):
         ]
     )
 
-    grid.add_element(col=8, row=7, width=2, height=2, element=fundamentals)
+    grid.add_element(col=8, row=6, width=2, height=2, element=fundamentals)
     
     annual_financials_df = all_info[7]
     annual = dash_table.DataTable(
@@ -446,7 +453,7 @@ def update_page(n_clicks, ticker):
         ]
     )
     
-    grid.add_element(col=8, row=9, width=5, height=2, element=annual)
+    grid.add_element(col=8, row=8, width=5, height=3, element=annual)
 
     quarterly_financials_df = all_info[8]
     quarterly = dash_table.DataTable(

@@ -124,7 +124,7 @@ def execute(ticker):
     annual_EPS_df = annual_NI_df.loc[annual_NI_df.METRIC == 'EPS (Diluted)']
     annual_EPS_growth_df = annual_NI_df.loc[annual_NI_df.METRIC == 'EPS (Diluted) Growth']
     annual_NI_df = annual_EPS_df.append(annual_EPS_growth_df)  # EPS and EPS Growth
-    annual_cash_df = annual_cash_df.loc[[1, 2], :]  # Cash and ST Securities
+    annual_cash_df = annual_cash_df.loc[0, :]  # Cash and ST Securities
     annual_debt_df = annual_debt_df.loc[annual_debt_df.METRIC == 'Long-Term Debt']  # Debt
     annual_fcf_df = annual_fcf_df.loc[annual_fcf_df.METRIC == 'Free Cash Flow']  # FCF
 
@@ -180,7 +180,7 @@ def execute(ticker):
     # Long Screen Tables
     # Fast Grower
     fast_data = [['Revenue Growth >15% last 3 yrs', False], ['EPS Growth >15% last 3 yrs', False],
-                 ['LTD/Cash + Securities <= 2', False], ['Positive FCF last 3 years', False]]
+                 ['LTD/Cash + Securities <= 2', False], ['Positive FCF last 3 years', False], ['Distrupting the status quo', 'Subjective']]
     fast_grower = pd.DataFrame(fast_data, columns=['FAST GROWER (LONG)', 'STATUS'])
     fast_grower = fast_grower.set_index(['FAST GROWER (LONG)'])
 
@@ -192,15 +192,16 @@ def execute(ticker):
 
     # Surfer
     surfer_data = [['Revenue Growth >35% last 3 yrs', False],
-                   ['Company will dominate/create an industry', 'Subjective'],
-                   ['Company will disrupt an industry', 'Subjective']]
+                   ['Company will dominate industry', 'Subjective'],
+                   ['Company will create industry', 'Subjective'],
+                   ['Company will disrupt industry', 'Subjective']]
     surfer = pd.DataFrame(surfer_data, columns=['SURFER (LONG)', 'STATUS'])
     surfer = surfer.set_index(['SURFER (LONG)'])
 
     # Short Screen Tables
     # Dead Company
     dead_data = [['Declining EPS last 4 qts', False], ['Declinging Revenue last 4 qts', False],
-                 ['LTD/Cash + Securities >= 2', False], ['Negative FCF', False]]
+                 ['LTD/Cash + Securities >= 2', False], ['Negative FCF', False], ['Company is being disrupted', 'Subjective']]
     dead_walking = pd.DataFrame(dead_data, columns=['DEAD COMPANY (SHORT)', 'STATUS'])
     dead_walking = dead_walking.set_index(['DEAD COMPANY (SHORT)'])
 
@@ -212,7 +213,7 @@ def execute(ticker):
 
     # Hot Story
     hot_data = [['Price increased dramatically, levelling off', 'Subjective'],
-                ['Many competitors', 'Subjective'], ['High PE ratio', False]]
+                ['Many competitors', 'Subjective'], ['High PE ratio', False], ['Industry the public is excited about', 'Subjective']]
     hot_story = pd.DataFrame(hot_data, columns=['HOT STORY (SHORT)', 'STATUS'])
     hot_story = hot_story.set_index(['HOT STORY (SHORT)'])
 
@@ -230,7 +231,7 @@ def execute(ticker):
             return 'False'
 
     def fast_debt_cash(df):
-        cash_securities = df.iloc[6, -1] + df.iloc[7, -1]
+        cash_securities = df.iloc[6, -1]
         debt = df.iloc[4, -1]
         if (debt / cash_securities <= 2):
             return 'True'
@@ -300,7 +301,7 @@ def execute(ticker):
             return 'False'
 
     def dead_debt_cash(df):
-        cash_securities = df.iloc[6, -1] + df.iloc[7, -1]
+        cash_securities = df.iloc[6, -1]
         debt = df.iloc[4, -1]
         if (debt / cash_securities >= 2):
             return 'True'
@@ -394,5 +395,4 @@ def execute(ticker):
     final_output.append(s9)
 
     return final_output
-
 
