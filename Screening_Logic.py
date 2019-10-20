@@ -124,12 +124,13 @@ def execute(ticker):
     annual_EPS_df = annual_NI_df.loc[annual_NI_df.METRIC == 'EPS (Diluted)']
     annual_EPS_growth_df = annual_NI_df.loc[annual_NI_df.METRIC == 'EPS (Diluted) Growth']
     annual_NI_df = annual_EPS_df.append(annual_EPS_growth_df)  # EPS and EPS Growth
-    annual_cash_df = annual_cash_df.loc[0, :]  # Cash and ST Securities
+    annual_cash_df = annual_cash_df.loc[[0]]  # Cash and ST Securities
     annual_debt_df = annual_debt_df.loc[annual_debt_df.METRIC == 'Long-Term Debt']  # Debt
     annual_fcf_df = annual_fcf_df.loc[annual_fcf_df.METRIC == 'Free Cash Flow']  # FCF
 
+
     annual_financials_df = annual_rev_df.append(
-        annual_NI_df.append(annual_debt_df.append(annual_fcf_df.append(annual_cash_df))))
+        annual_NI_df.append(annual_debt_df.append(annual_cash_df.append(annual_fcf_df))))
     annual_financials_df = annual_financials_df.drop(columns='5-year trend')
     annual_financials_df = annual_financials_df.set_index(['METRIC'])
     annual_financials_df = annual_financials_df.rename({'Sales Growth': 'Sales Growth (%)',
@@ -231,7 +232,7 @@ def execute(ticker):
             return 'False'
 
     def fast_debt_cash(df):
-        cash_securities = df.iloc[6, -1]
+        cash_securities = df.iloc[5, -1]
         debt = df.iloc[4, -1]
         if (debt / cash_securities <= 2):
             return 'True'
@@ -239,7 +240,7 @@ def execute(ticker):
             return 'False'
 
     def fast_fcf(df):
-        if (df.iloc[5, -1] > 0 and df.iloc[5, -2] > 0 and df.iloc[5, -3] > 0):
+        if (df.iloc[6, -1] > 0 and df.iloc[6, -2] > 0 and df.iloc[6, -3] > 0):
             return 'True'
         else:
             return 'False'
@@ -301,7 +302,7 @@ def execute(ticker):
             return 'False'
 
     def dead_debt_cash(df):
-        cash_securities = df.iloc[6, -1]
+        cash_securities = df.iloc[5, -1]
         debt = df.iloc[4, -1]
         if (debt / cash_securities >= 2):
             return 'True'
@@ -309,7 +310,7 @@ def execute(ticker):
             return 'False'
 
     def dead_fcf(df):
-        if (df.iloc[5, -1] < 0):
+        if (df.iloc[6, -1] < 0):
             return 'True'
         else:
             return 'False'
@@ -395,4 +396,3 @@ def execute(ticker):
     final_output.append(s9)
 
     return final_output
-
