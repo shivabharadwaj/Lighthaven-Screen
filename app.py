@@ -55,7 +55,7 @@ def update_page(n_clicks, ticker):
         style={"background-color": "gainsboro", "height": "100%", "width": "100%"}
     ))
 
-    grid.add_element(col=1, row=6, width=6, height=4, element=html.Div(
+    grid.add_element(col=1, row=8, width=6, height=2, element=html.Div(
         style={"background-color": "black", "height": "100%", "width": "100%"}
     ))
 
